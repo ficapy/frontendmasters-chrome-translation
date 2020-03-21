@@ -1,25 +1,25 @@
-const { youdao, baidu, google } = window.tjs
-
-let info = null
-let currentTabId = null
-
 chrome.runtime.onMessage.addListener(
-  function (request, sender, senResponse) {
-    chrome.windows.getCurrent((currentWindow) => {
-      currentTabId = currentWindow.id
-    })
+    function (request, sender, sendResponse) {
 
-    google.translate(request.par).then(result => {
-      if (!result.result) return
-      info = result.result.join('') 
-      senResponse(info)
-    }).catch((err) => {
-      info = '翻译出错'
-      senResponse(info)
-    })
+        const q = request.par.replace('\n', '')
+        const from = 'en'
+        const to = 'zh'
+        const translateurl = 'https://fanyi-api.baidu.com/api/trans/vip/translate'
+        const appid = 'xxxx'
+        const appkey = 'xxxx'
+        const salt = (new Date).getTime()
+        const sign = md5(appid + q + salt + appkey)
+        const url = `${translateurl}?q=${q}&from=${from}&to=${to}&appid=${appid}&salt=${salt}&sign=${sign}`
 
-    return true
-  }
+        fetch(url, {headers: {'content-type': 'application/json'}})
+            .then(res => res.json())
+            .then(data => sendResponse(data.trans_result[0].dst))
+            .catch(e => {
+                console.log(e.error_msg || e)
+                sendResponse('')
+            })
+        return true
+    }
 )
 
 

@@ -19,7 +19,6 @@
     //   "page": "background.html"
     "scripts": [
       "js/md5.min.js",
-      "js/tjs.browser.js",
       "js/background.js"
     ],
     "persistent": true
